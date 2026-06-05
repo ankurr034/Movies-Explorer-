@@ -3,36 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Movie Explorer — Discover, Review & Stream</title>
+    <meta name="description" content="Search movies, read reviews, build your wishlist, and find where to stream your favorite films.">
     <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
-    <header class="main-header">
-        <h1>Movie Explorer</h1>
-        <p>Discover movies, actors, and more!</p>
-    </header>
-    <div class="search-section">
-        <input type="text" id="movieName" placeholder="Search any movie by its name...">
-        <button class="btn" onclick="searchMovie()">Search movie</button>
-    </div>
-    <div class="container">
-        <div class="movie-details">
-            <h2 id="title"></h2>
-            <p id="desc"></p>
-            <p>Genre: <span id="genre"></span></p>
-            <p>Actors: <span id="actors"></span></p>
-            <p>Directors: <span id="directors"></span></p>
-            <p>Writers: <span id="writers"></span></p>
-            <p>Box Office Collection: <span id="collection"></span></p>
-            <p>Awards: <span id="awards"></span></p>
-            <p>IMDB Ratings: <span id="ratings"></span></p>
+
+    <!-- ===== HEADER ===== -->
+    <header class="main-header" id="main-header">
+        <div class="header-inner">
+            <div class="logo">
+                <i class="fa-solid fa-film"></i>
+                <h1>Movie Explorer</h1>
+            </div>
+            <p class="tagline">Discover movies, write reviews, build your watchlist</p>
+            <nav class="header-nav">
+                <button class="nav-btn active" id="nav-search" onclick="showTab('search')">
+                    <i class="fa-solid fa-magnifying-glass"></i> Search
+                </button>
+                <button class="nav-btn" id="nav-wishlist" onclick="showTab('wishlist')">
+                    <i class="fa-solid fa-heart"></i> Wishlist
+                    <span class="wishlist-count" id="wishlist-count">0</span>
+                </button>
+            </nav>
         </div>
-        <div class="poster-wrapper">
-            <img src="" id="poster" alt="">
+    </header>
+
+    <!-- ===== SEARCH TAB ===== -->
+    <main class="tab-content" id="tab-search">
+        <section class="search-section">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="movieName" placeholder="Search any movie by name..." autocomplete="off">
+                <button class="btn-search" id="btn-search" onclick="searchMovie()">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- Loading Spinner -->
+        <div class="loader-wrap" id="loader" style="display:none;">
+            <div class="spinner"></div>
+        </div>
+
+        <!-- Error Message -->
+        <div class="error-msg" id="error-msg" style="display:none;">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span id="error-text">Movie not found. Try a different name.</span>
+        </div>
+
+        <!-- Movie Result Card -->
+        <section class="movie-card" id="movie-card" style="display:none;">
+            <div class="card-inner">
+                <div class="poster-col">
+                    <div class="poster-wrapper">
+                        <img src="" id="poster" alt="Movie poster">
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-wishlist" id="btn-add-wishlist" onclick="toggleWishlist()">
+                            <i class="fa-regular fa-heart" id="wishlist-icon"></i>
+                            <span id="wishlist-btn-text">Add to Wishlist</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="details-col">
+                    <h2 id="title"></h2>
+                    <div class="meta-row">
+                        <span class="badge" id="year-badge"></span>
+                        <span class="badge" id="rated-badge"></span>
+                        <span class="badge" id="runtime-badge"></span>
+                    </div>
+                    <div class="genre-tags" id="genre-tags"></div>
+                    <p class="plot" id="desc"></p>
+
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label"><i class="fa-solid fa-user-group"></i> Cast</span>
+                            <span class="info-value" id="actors"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label"><i class="fa-solid fa-clapperboard"></i> Director</span>
+                            <span class="info-value" id="directors"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label"><i class="fa-solid fa-pen-nib"></i> Writers</span>
+                            <span class="info-value" id="writers"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label"><i class="fa-solid fa-trophy"></i> Awards</span>
+                            <span class="info-value" id="awards"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label"><i class="fa-solid fa-sack-dollar"></i> Box Office</span>
+                            <span class="info-value" id="collection"></span>
+                        </div>
+                    </div>
+
+                    <!-- Ratings Row -->
+                    <div class="ratings-row" id="ratings-row">
+                        <div class="rating-badge imdb">
+                            <i class="fa-brands fa-imdb"></i>
+                            <span id="ratings"></span>
+                        </div>
+                        <div class="rating-badge rt" id="rt-rating" style="display:none;">
+                            <span class="rt-icon">🍅</span>
+                            <span id="rt-score"></span>
+                        </div>
+                        <div class="rating-badge mc" id="mc-rating" style="display:none;">
+                            <span class="mc-icon">M</span>
+                            <span id="mc-score"></span>
+                        </div>
+                    </div>
+
+                    <!-- OTT Availability -->
+                    <div class="ott-section" id="ott-section">
+                        <h3><i class="fa-solid fa-tv"></i> Where to Watch</h3>
+                        <div class="ott-badges" id="ott-badges"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reviews Section -->
+            <div class="reviews-section" id="reviews-section">
+                <div class="reviews-header">
+                    <h3><i class="fa-solid fa-star"></i> User Reviews</h3>
+                    <button class="btn-write-review" onclick="openReviewModal()">
+                        <i class="fa-solid fa-pen"></i> Write a Review
+                    </button>
+                </div>
+                <div class="reviews-list" id="reviews-list"></div>
+                <div class="no-reviews" id="no-reviews">
+                    <i class="fa-regular fa-comment-dots"></i>
+                    <p>No reviews yet. Be the first to review!</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===== WISHLIST TAB ===== -->
+    <main class="tab-content" id="tab-wishlist" style="display:none;">
+        <section class="wishlist-section">
+            <div class="wishlist-header-bar">
+                <h2><i class="fa-solid fa-heart"></i> My Wishlist</h2>
+                <span class="wishlist-total" id="wishlist-total">0 movies</span>
+            </div>
+            <div class="wishlist-grid" id="wishlist-grid"></div>
+            <div class="wishlist-empty" id="wishlist-empty">
+                <i class="fa-regular fa-heart"></i>
+                <h3>Your wishlist is empty</h3>
+                <p>Search for movies and add them to your watchlist!</p>
+                <button class="btn-go-search" onclick="showTab('search')">
+                    <i class="fa-solid fa-magnifying-glass"></i> Browse Movies
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===== REVIEW MODAL ===== -->
+    <div class="modal-overlay" id="review-modal" style="display:none;">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeReviewModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3><i class="fa-solid fa-star"></i> Write a Review</h3>
+            <p class="modal-movie-title" id="modal-movie-title"></p>
+            <div class="star-rating-input" id="star-rating-input">
+                <span class="star-btn" data-value="1"><i class="fa-regular fa-star"></i></span>
+                <span class="star-btn" data-value="2"><i class="fa-regular fa-star"></i></span>
+                <span class="star-btn" data-value="3"><i class="fa-regular fa-star"></i></span>
+                <span class="star-btn" data-value="4"><i class="fa-regular fa-star"></i></span>
+                <span class="star-btn" data-value="5"><i class="fa-regular fa-star"></i></span>
+            </div>
+            <input type="text" id="review-name" placeholder="Your name" maxlength="40">
+            <textarea id="review-text" placeholder="Write your thoughts..." maxlength="500" rows="4"></textarea>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeReviewModal()">Cancel</button>
+                <button class="btn-submit-review" id="btn-submit-review" onclick="submitReview()">
+                    <i class="fa-solid fa-paper-plane"></i> Submit
+                </button>
+            </div>
         </div>
     </div>
 
+    <!-- ===== TOAST ===== -->
+    <div class="toast" id="toast">
+        <i class="fa-solid fa-check-circle"></i>
+        <span id="toast-text"></span>
+    </div>
+
+    <footer class="main-footer">
+        <p>Movie Explorer &copy; 2026 — Powered by <a href="https://www.omdbapi.com/" target="_blank">OMDb API</a></p>
+    </footer>
 
     <script src="app.js"></script>
 </body>
-</html
+</html>
